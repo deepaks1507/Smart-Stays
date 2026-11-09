@@ -1,0 +1,68 @@
+@startuml CD1 — Core Entities
+title SmartStays — Class Diagram (Part 1: Core Entities)
+
+skinparam classBackgroundColor #F0F4FF
+skinparam classBorderColor #4A6FA5
+skinparam arrowColor #4A6FA5
+skinparam classAttributeIconSize 0
+
+class User {
+  +Long id
+  +String name
+  +String email
+  +String phoneNumber
+  +String password
+  +String role
+}
+
+class Room {
+  +Long id
+  +String roomType
+  +String roomName
+  +BigDecimal roomPrice
+  +String roomPhotoUrl
+  +String roomDescription
+  +int totalInventory
+  +String location
+}
+
+class Location {
+  +Long id
+  +String name
+  +boolean isActive
+}
+
+class Booking {
+  +Long id
+  +LocalDate checkInDate
+  +LocalDate checkOutDate
+  +int numOfAdults
+  +int numOfChildren
+  +int totalNumOfGuest
+  +String bookingConfirmationCode
+  +String status
+  --
+  +calculateTotalNumberOfGuest()
+}
+
+class MealPlan {
+  +Long id
+  +String code
+  +String name
+  +String description
+  +BigDecimal pricePerPersonPerDay
+}
+
+class Amenity {
+  +Long id
+  +String name
+  +String iconKey
+  +String category
+}
+
+User "1" --> "0..*" Booking : places
+Room "1" --> "0..*" Booking : hosts
+Room "0..*" --> "0..*" Amenity : has
+Room "0..*" --> "1" Location : located at
+
+@enduml

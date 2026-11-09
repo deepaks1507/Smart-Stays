@@ -1,0 +1,58 @@
+@startuml SEQ3 — Payment & Booking Creation
+title SmartStays — Sequence Diagram (Part 3: Payment & Booking Creation)
+
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 5
+skinparam sequenceParticipantBackgroundColor #EEF4FF
+skinparam sequenceParticipantBorderColor #4A6FA5
+
+actor User
+participant "React App" as React
+participant "Spring Boot API\n:4040" as API
+database "MySQL DB" as DB
+
+== Submit Booking ==
+
+User -> React : Fill payment details + confirm
+React -> API : POST /bookings/book-room/{roomId}/{userId}\nAuthorization: Bearer <JWT>\nBody: {checkInDate, checkOutDate,\n  numOfAdults, numOfChildren}
+
+API -> API : JWTAuthFilter.doFilterInternal()\n— extract + validate JWT\n— set SecurityContextHolder
+
+alt JWT invalid or expired
+  API --> React : 401 Unauthorized
+  React --> User : Redirect to /login
+else JWT valid
+  API -> API : @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
+  API -> DB : SELECT bookings WHERE roomId = ?\nAND checkIn < existingCheckOut\nAND checkOut > existingCheckIn
+
+  alt Room not available
+    API --> React : 400 — Room not available for selected dates
+    React --> User : Show error message
+  else Room available
+    API -> DB : INSERT INTO bookings\n(confirmationCode, status=CONFIRMED, ...)
+    API -> DB : INSERT INTO payments\n(amount, status=SUCCESS, ...)
+    API -> DB : INSERT INTO notifications\n(message, userId, ...)
+    DB --> API : Saved Booking entity
+    API --> React : 200 OK {bookingConfirmationCode}
+    React --> User : Render confirmation screen with code
+  end
+end
+
+== Cancel Booking ==
+
+User -> React : Enter confirmation code on /find-booking
+React -> API : GET /bookings/get-by-confirmation-code/{code}
+API -> DB : SELECT booking WHERE code = ?
+DB --> API : Booking (room, user, dates)
+API --> React : 200 OK Booking
+React --> User : Show booking details + Cancel button
+
+User -> React : Click Cancel Booking
+React -> API : DELETE /bookings/cancel/{bookingId}\nAuthorization: Bearer <JWT>
+API -> API : Validate JWT + ownership check\nor ADMIN role
+API -> DB : UPDATE booking SET status = CANCELLED
+DB --> API : OK
+API --> React : 200 OK — "Booking cancelled"
+React --> User : Show cancellation confirmation
+
+@enduml

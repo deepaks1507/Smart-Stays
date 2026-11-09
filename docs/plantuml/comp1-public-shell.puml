@@ -1,0 +1,46 @@
+@startuml COMP1 — Public Shell Components
+title SmartStays — Component Diagram (Part 1: Public Shell)
+
+skinparam componentBackgroundColor #EEF4FF
+skinparam componentBorderColor #4A6FA5
+skinparam arrowColor #4A6FA5
+skinparam packageBackgroundColor #F5F5F5
+skinparam packageBorderColor #BBBBBB
+
+package "App.js (React Router root)" {
+
+  package "PublicShell" {
+    [Navbar] as Navbar
+    [Footer] as Footer
+
+    package "Public Pages" {
+      [HomePage\n/home] as Home
+      [AboutPage\n/about] as About
+      [AllRoomsPage\n/rooms] as AllRooms
+      [RoomDetailsPage\n/rooms/:id] as RoomDetails
+      [FindBookingPage\n/find-booking] as FindBooking
+      [LoginPage\n/login] as Login
+      [RegisterPage\n/register] as Register
+    }
+
+    package "Protected User Pages" {
+      [ProfilePage\n/profile] as Profile
+      [EditProfilePage\n/profile/edit] as EditProfile
+      [PaymentPage\n/payment] as Payment
+    }
+  }
+
+  package "Shared Components" {
+    [RoomSearch\n(date, type, location filters)] as RoomSearch
+    [RoomCard\n(photo, price, details)] as RoomCard
+    [Pagination] as Pagination
+  }
+}
+
+AllRooms --> RoomSearch : uses
+AllRooms --> RoomCard : uses
+AllRooms --> Pagination : uses
+RoomDetails --> RoomSearch : uses
+Profile --> RoomCard : uses
+
+@enduml

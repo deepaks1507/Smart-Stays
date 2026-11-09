@@ -1,0 +1,58 @@
+@startuml ACT2 — Admin Management Flow
+title SmartStays — Activity Diagram: Admin Management Flow
+
+skinparam activityBackgroundColor #FFF3E0
+skinparam activityBorderColor #E65100
+skinparam arrowColor #E65100
+
+start
+
+:Admin Logs In\nPOST /auth/login (role: ADMIN);
+:Admin Dashboard\n(/admin)\nStat Cards + Quick Tiles;
+
+fork
+  partition "Manage Rooms" {
+    :View All Rooms\nGET /rooms/all;
+    if (Action?) then (Add)
+      :Upload Photo;
+      :POST /rooms/add;
+    elseif (Edit) then
+      :PUT /rooms/update/{id};
+    else (Delete)
+      :DELETE /rooms/delete/{id};
+    endif
+  }
+fork again
+  partition "Manage Bookings" {
+    :View All Bookings\nGET /bookings/all;
+    if (Action?) then (Archive)
+      :Update booking status;
+    else (Cancel)
+      :DELETE /bookings/cancel/{id};
+    endif
+  }
+fork again
+  partition "Manage Coupons" {
+    :View Coupons\nGET /coupons;
+    if (Action?) then (Create)
+      :POST /coupons;
+    elseif (Toggle) then
+      :PUT /coupons/{id}/toggle-active;
+    else (Delete)
+      :DELETE /coupons/{id};
+    endif
+  }
+fork again
+  partition "Manage Meal Plans" {
+    :View Meal Plans\nGET /meal-plans;
+    if (Action?) then (Create)
+      :POST /meal-plans;
+    else (Delete)
+      :DELETE /meal-plans/{id};
+    endif
+  }
+end fork
+
+stop
+
+@enduml

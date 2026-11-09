@@ -1,0 +1,42 @@
+@startuml COMP2 — Admin Layout Components
+title SmartStays — Component Diagram (Part 2: Admin Layout)
+
+skinparam componentBackgroundColor #FFF3E0
+skinparam componentBorderColor #E65100
+skinparam arrowColor #E65100
+skinparam packageBackgroundColor #F5F5F5
+skinparam packageBorderColor #BBBBBB
+
+package "AdminLayout (sidebar nav)" {
+  [AdminSidebar\n(navigation links)] as Sidebar
+  [AdminTopbar / Header] as Topbar
+
+  package "Admin Pages (ADMIN role only)" {
+    [AdminPage\n/admin\n(stat cards, quick tiles)] as AdminDash
+    [ManageRoomPage\n/admin/manage-rooms] as ManageRooms
+    [AddRoomPage\n/admin/add-room] as AddRoom
+    [EditRoomPage\n/admin/edit-room/:id] as EditRoom
+    [ManageBookingsPage\n/admin/manage-bookings] as ManageBookings
+    [EditBookingPage\n/admin/edit-booking/:code] as EditBooking
+    [ManageCouponsPage\n/admin/manage-coupons] as ManageCoupons
+    [ManageMealPlansPage\n/admin/manage-meal-plans] as ManageMeals
+  }
+}
+
+note right of AdminDash
+  Stat Cards:
+  - Total Rooms
+  - Total Bookings
+  - Active Coupons
+end note
+
+Sidebar --> AdminDash : navigates
+Sidebar --> ManageRooms : navigates
+Sidebar --> ManageBookings : navigates
+Sidebar --> ManageCoupons : navigates
+Sidebar --> ManageMeals : navigates
+ManageRooms --> AddRoom : navigates
+ManageRooms --> EditRoom : navigates
+ManageBookings --> EditBooking : navigates
+
+@enduml

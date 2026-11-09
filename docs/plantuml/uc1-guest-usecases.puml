@@ -1,0 +1,33 @@
+@startuml UC1 — Guest Use Cases
+title SmartStays — Guest (Public) Use Cases
+
+left to right direction
+skinparam actorStyle awesome
+skinparam usecase {
+  BackgroundColor #EEF4FF
+  BorderColor #4A6FA5
+  ArrowColor #4A6FA5
+}
+
+actor "Guest\n(Unauthenticated)" as G #LightBlue
+
+rectangle "SmartStays — Public Features" {
+  usecase "Browse Rooms" as UC1
+  usecase "Search Rooms\nby Date & Type" as UC2
+  usecase "View Room Details" as UC3
+  usecase "Find Booking by\nConfirmation Code" as UC4
+  usecase "Register Account" as UC5
+  usecase "Login" as UC6
+}
+
+G --> UC1
+G --> UC2
+G --> UC3
+G --> UC4
+G --> UC5
+G --> UC6
+
+UC1 ..> UC2 : <<extends>>
+UC2 ..> UC3 : <<extends>>
+
+@enduml

@@ -1,0 +1,43 @@
+@startuml SEQ2 — Search & Book
+title SmartStays — Sequence Diagram (Part 2: Search & Book a Room)
+
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 5
+skinparam sequenceParticipantBackgroundColor #EEF4FF
+skinparam sequenceParticipantBorderColor #4A6FA5
+
+actor User
+participant "React App" as React
+participant "Spring Boot API\n:4040" as API
+database "MySQL DB" as DB
+
+== Availability Search ==
+
+User -> React : Enter check-in, check-out, room type
+React -> API : GET /rooms/available-rooms-by-date-and-type\n?checkInDate=&checkOutDate=&roomType=
+API -> DB : SELECT rooms WHERE no overlapping\nbookings exist for given date range
+DB --> API : Available rooms list
+API --> React : 200 OK [Room[]]
+React --> User : Update room list display
+
+== View Room Details ==
+
+User -> React : Click room card → /rooms/{id}
+React -> API : GET /rooms/{id}
+API -> DB : SELECT room WHERE id = ?\n(with amenities, meal plans)
+DB --> API : Room object
+API --> React : 200 OK Room
+React --> User : Show date picker, meal plan selector,\nBook Now button
+
+== Navigate to Payment ==
+
+User -> React : Click Book Now
+React -> React : Check localStorage for JWT token
+
+alt Not logged in
+  React --> User : Redirect to /login
+else Logged in
+  React --> User : Navigate to /payment\n(booking data in router state)
+end
+
+@enduml

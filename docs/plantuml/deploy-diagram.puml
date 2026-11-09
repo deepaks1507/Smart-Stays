@@ -1,0 +1,56 @@
+@startuml DEPLOY — Deployment Diagram
+title SmartStays — Deployment Diagram
+
+skinparam nodeBackgroundColor #EEF4FF
+skinparam nodeBorderColor #4A6FA5
+skinparam componentBackgroundColor #F5F5F5
+skinparam componentBorderColor #BBBBBB
+skinparam arrowColor #4A6FA5
+skinparam databaseBackgroundColor #FFF9C4
+skinparam databaseBorderColor #F9A825
+
+node "User's Browser" as Browser {
+  component "React SPA\n(Create React App dev server)\nhttp://localhost:7070" as ReactApp
+}
+
+node "Spring Boot Server\n(port 4040)" as AppServer {
+  component "PhegonHotel.jar\n(embedded Tomcat)" as JAR
+
+  component "JWTAuthFilter\n(validates Bearer token)" as JWTFilter
+  component "REST Controllers\n(/auth, /rooms, /bookings,\n/users, /reviews, /coupons,\n/wishlist, /meal-plans)" as Controllers
+  component "Spring Data JPA\n(Hibernate ORM)" as JPA
+
+  folder "uploads/room-images/\n(local disk)" as LocalStorage {
+    component "AwsS3Service\n(saves files locally,\nreturns http://localhost:4040/images/{file})" as FileService
+  }
+
+  component "CorsConfig\n(/images/** resource handler)" as CorsConfig
+
+  JAR --> JWTFilter
+  JWTFilter --> Controllers
+  Controllers --> JPA
+  Controllers --> FileService
+  FileService --> LocalStorage
+  CorsConfig --> LocalStorage : serves via /images/**
+}
+
+database "MySQL Database\n(port 3306)\n\nTables: users, rooms,\nbookings, reviews,\npayments, coupons,\nmeal_plans, amenities,\nwishlist, notifications,\npricing_rules, locations,\ncancellation_policies" as MySQL
+
+package "application.properties" as Config {
+  component "spring.datasource.url=\njdbc:mysql://localhost:3306/phegon_hotel_db" as DBConf
+  component "app.upload.dir=\nuploads/room-images" as UploadConf
+  component "app.base-url=\nhttp://localhost:4040" as BaseUrlConf
+}
+
+' Communication flows
+Browser --> ReactApp : renders
+ReactApp --> JAR : REST API calls\nHTTP → http://localhost:4040\nAuthorization: Bearer JWT\n(CORS: localhost:7070 allowed)
+JPA --> MySQL : JDBC / HikariCP\nSQL queries & transactions
+ReactApp --> CorsConfig : GET /images/{filename}\n(room photo display)
+
+' Config wiring
+DBConf ..> JPA : configures
+UploadConf ..> FileService : configures upload path
+BaseUrlConf ..> FileService : configures returned URL prefix
+
+@enduml

@@ -1,0 +1,40 @@
+@startuml UC3 — Admin Use Cases
+title SmartStays — Admin Use Cases
+
+left to right direction
+skinparam actorStyle awesome
+skinparam usecase {
+  BackgroundColor #FFF3E0
+  BorderColor #E65100
+  ArrowColor #E65100
+}
+
+actor "Admin" as A #Orange
+
+rectangle "SmartStays — Admin Features" {
+  usecase "View Dashboard Stats" as UC23
+  usecase "Add / Edit / Delete Room" as UC17
+  usecase "Set Room Inventory" as UC18
+  usecase "Manage Bookings\n(View All & Archive)" as UC19
+  usecase "Manage Coupons\n(Create, Toggle, Delete)" as UC20
+  usecase "Manage Meal Plans\n(Create, Delete)" as UC21
+  usecase "Reply to Reviews" as UC22
+}
+
+note right of A
+  Admin also inherits
+  all User use-cases
+  (browse, book, profile, etc.)
+end note
+
+A --> UC23
+A --> UC17
+A --> UC18
+A --> UC19
+A --> UC20
+A --> UC21
+A --> UC22
+
+UC17 ..> UC18 : <<include>>
+
+@enduml

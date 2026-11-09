@@ -1,0 +1,56 @@
+@startuml ACT1 — User Booking Flow
+title SmartStays — Activity Diagram: User Booking Flow
+
+skinparam activityBackgroundColor #EEF4FF
+skinparam activityBorderColor #4A6FA5
+skinparam arrowColor #4A6FA5
+skinparam noteBackgroundColor #FFFDE7
+
+start
+
+:Browse Rooms\n(AllRoomsPage);
+:Apply Filters\n(RoomSearch: date, type, guests);
+:Select Room\n(RoomDetailsPage);
+:Pick Dates + Guests + Meal Plan;
+:Click **Book Now**;
+
+if (Logged In?) then (No)
+  :Redirect to /login;
+  :Enter Credentials;
+  if (Auth OK?) then (No)
+    :Show Login Error;
+    stop
+  else (Yes)
+    :Store JWT in localStorage;
+    :Return to Booking;
+  endif
+endif
+
+:Navigate to PaymentPage\n(/payment);
+:Fill Payment Details\n(card / UPI / net banking);
+:Apply Coupon Code (optional);
+
+if (Payment Details Valid?) then (No)
+  :Show Validation Error;
+  stop
+else (Yes)
+  :POST /bookings/book-room/{roomId}/{userId}\n(JWT in Authorization header);
+  if (JWT Valid?) then (No)
+    :401 Unauthorized → Redirect to Login;
+    stop
+  else (Yes)
+    if (Room Available for Dates?) then (No)
+      :Show "Room Not Available" Error;
+      stop
+    else (Yes)
+      :Create Booking in DB\n(status: CONFIRMED);
+      :Record Payment entity;
+      :Send Notification;
+      :Show Confirmation Code\n(Success Screen);
+    endif
+  endif
+endif
+
+stop
+
+@enduml

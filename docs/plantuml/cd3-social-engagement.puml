@@ -1,0 +1,63 @@
+@startuml CD3 — Social & Engagement
+title SmartStays — Class Diagram (Part 3: Reviews, Wishlist & Notifications)
+
+skinparam classBackgroundColor #F0F4FF
+skinparam classBorderColor #4A6FA5
+skinparam arrowColor #4A6FA5
+skinparam classAttributeIconSize 0
+
+class User {
+  +Long id
+  +String name
+  +String email
+}
+
+class Room {
+  +Long id
+  +String roomType
+  +String roomName
+  +BigDecimal roomPrice
+  +String location
+}
+
+class Review {
+  +Long id
+  +int rating
+  +String comment
+  +String adminReply
+  +LocalDateTime createdAt
+}
+
+class Wishlist {
+  +Long id
+  +LocalDateTime savedAt
+}
+
+class Notification {
+  +Long id
+  +String type
+  +String channel
+  +String title
+  +String message
+  +boolean isRead
+  +LocalDateTime sentAt
+}
+
+class PricingRule {
+  +Long id
+  +String label
+  +LocalDate startDate
+  +LocalDate endDate
+  +Integer dayOfWeek
+  +BigDecimal priceOverride
+  +BigDecimal priceMultiplier
+}
+
+User "1" --> "0..*" Review : writes
+Room "1" --> "0..*" Review : receives
+User "1" --> "0..*" Wishlist : maintains
+Wishlist "0..*" --> "1" Room : references
+User "1" --> "0..*" Notification : receives
+Room "1" --> "0..*" PricingRule : has
+
+@enduml

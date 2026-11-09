@@ -1,0 +1,47 @@
+@startuml COMP3 — Service Layer & API Calls
+title SmartStays — Component Diagram (Part 3: Service Layer & API Calls)
+
+skinparam componentBackgroundColor #E8F5E9
+skinparam componentBorderColor #388E3C
+skinparam arrowColor #388E3C
+skinparam packageBackgroundColor #F5F5F5
+skinparam packageBorderColor #BBBBBB
+skinparam databaseBackgroundColor #FFF3E0
+
+package "Frontend (React)" {
+  [AllRoomsPage / RoomDetailsPage] as RoomPages
+  [LoginPage / RegisterPage] as AuthPages
+  [ProfilePage / EditProfilePage] as UserPages
+  [PaymentPage] as Payment
+  [FindBookingPage] as FindBooking
+  [AdminPages] as Admin
+
+  package "Service Layer" {
+    [ApiService.js\n(Axios instance)\nAuto-attaches JWT\nCentralised error handling] as ApiService
+  }
+}
+
+package "Backend (Spring Boot :4040)" {
+  [AuthController\n/auth/login\n/auth/register] as AuthCtrl
+  [RoomController\n/rooms/**] as RoomCtrl
+  [BookingController\n/bookings/**] as BookingCtrl
+  [UserController\n/users/**] as UserCtrl
+  [CouponController\n/coupons/**] as CouponCtrl
+  [MealPlanController\n/meal-plans/**] as MealCtrl
+}
+
+RoomPages --> ApiService : GET /rooms/all\nGET /rooms/available-by-date-type\nGET /rooms/{id}
+AuthPages --> ApiService : POST /auth/login\nPOST /auth/register
+UserPages --> ApiService : GET /users/get-logged-in-profile-info\nGET /users/get-user-bookings/{id}
+Payment --> ApiService : POST /bookings/book-room/{roomId}/{userId}\nPOST /coupons/validate
+FindBooking --> ApiService : GET /bookings/get-by-confirmation-code/{code}\nDELETE /bookings/cancel/{id}
+Admin --> ApiService : GET /rooms/all, POST /rooms/add\nGET /bookings/all, GET /coupons\nPOST /coupons, DELETE /coupons/{id}
+
+ApiService --> AuthCtrl : REST over HTTP\nCORS: localhost:7070 → 4040
+ApiService --> RoomCtrl
+ApiService --> BookingCtrl
+ApiService --> UserCtrl
+ApiService --> CouponCtrl
+ApiService --> MealCtrl
+
+@enduml

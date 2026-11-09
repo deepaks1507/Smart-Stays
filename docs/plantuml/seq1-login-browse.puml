@@ -1,0 +1,48 @@
+@startuml SEQ1 — Login & Browse
+title SmartStays — Sequence Diagram (Part 1: Login & Browse Rooms)
+
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 5
+skinparam sequenceParticipantBackgroundColor #EEF4FF
+skinparam sequenceParticipantBorderColor #4A6FA5
+
+actor User
+participant "React App" as React
+participant "Spring Boot API\n:4040" as API
+database "MySQL DB" as DB
+
+== Authentication ==
+
+User -> React : Navigate to /login
+User -> React : Enter email + password
+React -> API : POST /auth/login\n{email, password}
+API -> DB : SELECT user WHERE email = ?
+DB --> API : User record (hashed password, role)
+API -> API : BCrypt.matches(input, hash)
+
+alt Invalid credentials
+  API --> React : 400 — invalid credentials
+  React --> User : Show error message
+else Valid credentials
+  API -> API : JWTUtils.generateToken(user)
+  API --> React : 200 OK {token, role, expirationTime}
+  React -> React : localStorage.setItem("token", jwt)
+  React --> User : Redirect to /home or /admin
+end
+
+== Browse All Rooms ==
+
+User -> React : Navigate to /rooms
+React -> API : GET /rooms/all
+API -> DB : SELECT * FROM rooms
+DB --> API : Rooms list (with roomPhotoUrl)
+API --> React : 200 OK [Room[]]
+note right of React
+  roomPhotoUrl is an external Pexels URL
+  (https://images.pexels.com/...).
+  Images are loaded directly by the
+  browser — no local file serving needed.
+end note
+React --> User : Render RoomCard list with images
+
+@enduml

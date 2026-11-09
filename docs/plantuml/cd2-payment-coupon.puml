@@ -1,0 +1,64 @@
+@startuml CD2 — Payment & Coupon
+title SmartStays — Class Diagram (Part 2: Payment & Coupon)
+
+skinparam classBackgroundColor #F0F4FF
+skinparam classBorderColor #4A6FA5
+skinparam arrowColor #4A6FA5
+skinparam classAttributeIconSize 0
+
+enum DiscountType {
+  PERCENT
+  FLAT
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+class Booking {
+  +Long id
+  +String bookingConfirmationCode
+  +String status
+}
+
+class Payment {
+  +Long id
+  +BigDecimal amount
+  +String currency
+  +String paymentGateway
+  +String status
+  +LocalDateTime paidAt
+}
+
+class Coupon {
+  +Long id
+  +String code
+  +DiscountType discountType
+  +BigDecimal discountValue
+  +BigDecimal minBookingAmount
+  +BigDecimal maxDiscountCap
+  +LocalDate validFrom
+  +LocalDate validUntil
+  +int usageLimit
+  +int timesUsed
+  +boolean isActive
+}
+
+class CancellationPolicy {
+  +Long id
+  +String name
+  +boolean isFreeCancel
+  +Integer freeCancellationHoursBefore
+  +Integer partialRefundPercentage
+  +String policyDescription
+}
+
+Booking "1" --> "0..*" Payment : paid via
+Coupon --> DiscountType : uses
+Payment --> PaymentStatus : has status
+Booking "0..*" --> "1" CancellationPolicy : governed by
+
+@enduml
