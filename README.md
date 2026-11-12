@@ -102,3 +102,43 @@ Smart-Stays/
 |---|---|---|
 | Admin | admin@hotel.com | admin123 |
 | User | user@hotel.com | user123 |
+
+---
+
+## Roadmap
+
+### Phase 1 — Core UX
+
+- **Search & Filter** — filter rooms by price range, amenities, location, and rating
+- **Room Detail Page** — full photo gallery, amenity icons, meal plan selector, cancellation policy tag
+- **Availability Badge** — "Only 2 left!" / "Sold Out" computed from `total_inventory` minus active bookings
+- **Booking Summary** — price breakdown (base + taxes + meal plan + coupon discount) before confirmation
+
+### Phase 2 — Payments & Offers
+
+- **Payment Gateway** — Razorpay / Stripe integration (Payment entity already in DB)
+- **Coupon Apply** — input field on booking page, validated via existing `CouponService`
+- **Refund Flow** — automatic refund on cancellation based on `CancellationPolicy` rules
+- **Invoice / Receipt** — PDF download after booking confirmation
+
+### Phase 3 — User Features
+
+- **Wishlist** — save/unsave rooms (entity and service already exist)
+- **Notifications** — in-app booking confirmations and reminders (entity and service already exist)
+- **Review System** — star rating display, average rating on room card, filter reviews by rating
+- **Booking History** — timeline view with status badges (Upcoming / Completed / Cancelled)
+
+### Phase 4 — Admin Features
+
+- **Analytics Dashboard** — revenue chart, occupancy rate, top rooms, bookings per month
+- **Pricing Rules UI** — admin-managed weekend / peak / festive price overrides (entity exists)
+- **Coupon Management** — create and disable coupons from the admin panel (entity exists)
+- **Notification Broadcast** — send offers and announcements to all users
+
+### Phase 5 — Advanced
+
+- **Multi-property Support** — group rooms under a Property (Hotel / PG / Hostel / Banquet Hall etc.)
+- **Map Integration** — Google Maps on room and property detail pages
+- **Email Notifications** — booking confirmation and reminder emails via JavaMailSender
+- **Mobile Responsive** — optimised layouts for all screen sizes
+- **OAuth Login** — Google / GitHub login via Spring Security OAuth2
